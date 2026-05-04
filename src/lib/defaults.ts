@@ -1,0 +1,101 @@
+import type { Category } from "./types";
+
+const now = () => new Date().toISOString();
+
+export const colorSwatches = [
+  { name: "Teal", value: "#14b8a6" },
+  { name: "Blue", value: "#3b82f6" },
+  { name: "Rose", value: "#f43f5e" },
+  { name: "Violet", value: "#8b5cf6" },
+  { name: "Amber", value: "#f59e0b" },
+  { name: "Emerald", value: "#10b981" },
+  { name: "Cyan", value: "#06b6d4" },
+  { name: "Orange", value: "#f97316" },
+  { name: "Slate", value: "#94a3b8" },
+];
+
+export const iconChoices = [
+  "Utensils",
+  "Coffee",
+  "ShoppingBag",
+  "Plane",
+  "Train",
+  "Car",
+  "Repeat2",
+  "Receipt",
+  "Home",
+  "Phone",
+  "Gift",
+  "Heart",
+  "BookOpen",
+  "Wallet",
+  "BriefcaseBusiness",
+  "Sparkles",
+  "MoreHorizontal",
+];
+
+export const defaultCategories: Category[] = [
+  {
+    id: "dining-drinks",
+    name: "Dining & Drinks",
+    icon: "Utensils",
+    color: "#14b8a6",
+    archived: false,
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "coffee",
+    name: "Coffee",
+    icon: "Coffee",
+    color: "#f59e0b",
+    archived: false,
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "shopping",
+    name: "Shopping",
+    icon: "ShoppingBag",
+    color: "#f43f5e",
+    archived: false,
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "travel",
+    name: "Travel",
+    icon: "Plane",
+    color: "#3b82f6",
+    archived: false,
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "subscriptions",
+    name: "Subscriptions",
+    icon: "Repeat2",
+    color: "#8b5cf6",
+    archived: false,
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "work",
+    name: "Work",
+    icon: "BriefcaseBusiness",
+    color: "#10b981",
+    archived: false,
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "misc",
+    name: "Misc",
+    icon: "Sparkles",
+    color: "#94a3b8",
+    archived: false,
+    createdAt: now(),
+    updatedAt: now(),
+  },
+];
