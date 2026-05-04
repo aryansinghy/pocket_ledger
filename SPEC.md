@@ -11,7 +11,7 @@ Pocket Ledger is a personal, phone-only expense tracker for iPhone home-screen u
 - No cloud sync.
 - No custom domain requirement.
 - No budgets.
-- No notes, merchants, tags, receipts, OCR, or recurring expenses in v1.
+- No merchants, tags, receipts, OCR, or recurring expenses in v1.
 - No light mode in v1.
 - No multi-currency support.
 
@@ -79,6 +79,7 @@ type Expense = {
   paymentSource: PaymentSource;
   categoryId: string;
   date: string; // YYYY-MM-DD
+  note?: string;
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
 };
@@ -155,6 +156,7 @@ Fields:
 - Paid With: Me / Dad
 - Category
 - Date
+- Note
 
 Defaults:
 
@@ -162,6 +164,7 @@ Defaults:
 - Paid With: no selection.
 - Category: no selection.
 - Date: today.
+- Note: empty.
 
 Validation:
 
@@ -175,8 +178,17 @@ After successful save:
 - Clear paid-with selection.
 - Clear category selection.
 - Reset date to today.
+- Clear note.
 - Stay on Add tab.
 - Show subtle success feedback.
+
+Note behavior:
+
+- Optional.
+- Label is `Note`.
+- No placeholder text.
+- Expense rows show a small note icon when a note exists.
+- Tapping the note icon shows the note without opening edit mode.
 
 ## Month Tab
 
@@ -238,6 +250,7 @@ Fields:
 - Paid With: Me / Dad
 - Category
 - Date
+- Note
 
 Actions:
 
@@ -279,7 +292,7 @@ JSON backup:
 CSV export:
 
 - Used for spreadsheet viewing.
-- Required columns: Date, Amount, Paid With, Category.
+- Required columns: Date, Amount, Paid With, Category, Note.
 
 Last backup:
 

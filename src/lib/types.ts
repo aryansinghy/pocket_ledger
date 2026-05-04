@@ -6,6 +6,7 @@ export type Expense = {
   paymentSource: PaymentSource;
   categoryId: string;
   date: string;
+  note?: string;
   createdAt: string;
   updatedAt: string;
 };

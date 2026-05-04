@@ -16,6 +16,7 @@ import {
   Gift,
   Heart,
   Home,
+  MessageSquareText,
   MoreHorizontal,
   Plane,
   Plus,
@@ -79,6 +80,7 @@ type ExpenseDraft = {
   paymentSource: PaymentSource | "";
   categoryId: string;
   date: string;
+  note: string;
 };
 
 type CategoryDraft = {
@@ -93,6 +95,7 @@ const emptyExpenseDraft = (): ExpenseDraft => ({
   paymentSource: "",
   categoryId: "",
   date: todayISO(),
+  note: "",
 });
 
 const newCategoryDraft = (): CategoryDraft => ({
@@ -108,6 +111,7 @@ export default function App() {
   const [historyCategory, setHistoryCategory] = useState("All");
   const [expenseDraft, setExpenseDraft] = useState(emptyExpenseDraft);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [viewingNote, setViewingNote] = useState<{ title: string; note: string } | null>(null);
   const [categoryDraft, setCategoryDraft] = useState<CategoryDraft | null>(null);
   const [toast, setToast] = useState("");
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -143,6 +147,7 @@ export default function App() {
       paymentSource: expenseDraft.paymentSource as PaymentSource,
       categoryId: expenseDraft.categoryId,
       date: expenseDraft.date,
+      note: cleanNote(expenseDraft.note),
       createdAt: now,
       updatedAt: now,
     });
@@ -158,6 +163,7 @@ export default function App() {
       paymentSource: draft.paymentSource as PaymentSource,
       categoryId: draft.categoryId,
       date: draft.date,
+      note: cleanNote(draft.note),
       updatedAt: new Date().toISOString(),
     });
     setEditingExpense(null);
@@ -286,6 +292,7 @@ export default function App() {
                 monthInfo={selectedMonthInfo}
                 onMonthChange={setSelectedMonth}
                 onEdit={setEditingExpense}
+                onShowNote={setViewingNote}
               />
             </Screen>
           )}
@@ -303,6 +310,7 @@ export default function App() {
                 onPaymentChange={setHistoryPayment}
                 onCategoryChange={setHistoryCategory}
                 onEdit={setEditingExpense}
+                onShowNote={setViewingNote}
               />
             </Screen>
           )}
@@ -358,6 +366,14 @@ export default function App() {
             onClose={() => setEditingExpense(null)}
             onSave={handleSaveExpense}
             onDelete={handleDeleteExpense}
+          />
+        )}
+        {viewingNote && (
+          <NoteSheet
+            key="note"
+            title={viewingNote.title}
+            note={viewingNote.note}
+            onClose={() => setViewingNote(null)}
           />
         )}
         {categoryDraft && (
@@ -481,6 +497,16 @@ function AddTab({
         </button>
       </section>
 
+      <label className="block">
+        <FieldLabel>Note</FieldLabel>
+        <input
+          className="input-control mt-3"
+          value={draft.note}
+          maxLength={120}
+          onChange={(event) => setDraft((current) => ({ ...current, note: event.target.value }))}
+        />
+      </label>
+
       <motion.button
         whileTap={isValid ? { scale: 0.98 } : undefined}
         className="h-[60px] w-full rounded-[22px] bg-accent px-5 py-4 text-base font-bold text-ink-950 shadow-lift transition disabled:bg-slate-800 disabled:text-slate-500 disabled:shadow-none"
@@ -500,6 +526,7 @@ function MonthTab({
   monthInfo,
   onMonthChange,
   onEdit,
+  onShowNote,
 }: {
   categories: Category[];
   expenses: Expense[];
@@ -507,6 +534,7 @@ function MonthTab({
   monthInfo: ReturnType<typeof monthBounds>;
   onMonthChange: (month: string) => void;
   onEdit: (expense: Expense) => void;
+  onShowNote: (note: { title: string; note: string }) => void;
 }) {
   const spent = total(expenses);
   const meTotal = total(expenses.filter((expense) => expense.paymentSource === "Me"));
@@ -571,7 +599,13 @@ function MonthTab({
       </Card>
 
       <Card title="Recent Expenses">
-        <ExpenseList expenses={expenses.slice(0, 6)} categories={categories} onEdit={onEdit} empty="No recent expenses." />
+        <ExpenseList
+          expenses={expenses.slice(0, 6)}
+          categories={categories}
+          onEdit={onEdit}
+          onShowNote={onShowNote}
+          empty="No recent expenses."
+        />
       </Card>
     </div>
   );
@@ -588,6 +622,7 @@ function HistoryTab({
   onPaymentChange,
   onCategoryChange,
   onEdit,
+  onShowNote,
 }: {
   categories: Category[];
   expenses: Expense[];
@@ -599,6 +634,7 @@ function HistoryTab({
   onPaymentChange: (payment: PaymentSource | "All") => void;
   onCategoryChange: (categoryId: string) => void;
   onEdit: (expense: Expense) => void;
+  onShowNote: (note: { title: string; note: string }) => void;
 }) {
   const filtered = expenses.filter((expense) => {
     const paymentMatches = payment === "All" || expense.paymentSource === payment;
@@ -632,7 +668,7 @@ function HistoryTab({
             {Object.entries(grouped).map(([date, dateExpenses]) => (
               <div key={date}>
                 <p className="mb-2 text-sm font-semibold text-slate-400">{formatLongDate(date)}</p>
-                <ExpenseList expenses={dateExpenses} categories={categories} onEdit={onEdit} empty="" />
+                <ExpenseList expenses={dateExpenses} categories={categories} onEdit={onEdit} onShowNote={onShowNote} empty="" />
               </div>
             ))}
           </div>
@@ -736,6 +772,7 @@ function EditExpenseSheet({
     paymentSource: expense.paymentSource,
     categoryId: expense.categoryId,
     date: expense.date,
+    note: expense.note || "",
   });
   const availableCategories = categories.filter((category) => !category.archived || category.id === expense.categoryId);
 
@@ -762,12 +799,39 @@ function EditExpenseSheet({
           ))}
         </div>
         <input className="input-control" type="date" value={draft.date} onChange={(event) => setDraft((current) => ({ ...current, date: event.target.value }))} />
+        <label className="block">
+          <FieldLabel>Note</FieldLabel>
+          <input
+            className="input-control mt-3"
+            value={draft.note}
+            maxLength={120}
+            onChange={(event) => setDraft((current) => ({ ...current, note: event.target.value }))}
+          />
+        </label>
         <button className="primary-action" disabled={!isValidExpenseDraft(draft)} onClick={() => onSave(draft)}>
           Save Changes
         </button>
         <button className="danger-action" onClick={onDelete}>
           Delete Expense
         </button>
+      </div>
+    </BottomSheet>
+  );
+}
+
+function NoteSheet({ title, note, onClose }: { title: string; note: string; onClose: () => void }) {
+  return (
+    <BottomSheet title="Note" onClose={onClose}>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
+            <MessageSquareText className="h-5 w-5" />
+          </span>
+          <p className="min-w-0 flex-1 truncate font-semibold">{title}</p>
+        </div>
+        <p className="whitespace-pre-wrap rounded-2xl border border-white/10 bg-white/[0.04] p-4 leading-relaxed text-slate-200">
+          {note}
+        </p>
       </div>
     </BottomSheet>
   );
@@ -880,29 +944,52 @@ function BottomNav({ activeTab, onChange }: { activeTab: TabId; onChange: (tab: 
   );
 }
 
-function ExpenseList({ expenses, categories, onEdit, empty }: { expenses: Expense[]; categories: Category[]; onEdit: (expense: Expense) => void; empty: string }) {
+function ExpenseList({
+  expenses,
+  categories,
+  onEdit,
+  onShowNote,
+  empty,
+}: {
+  expenses: Expense[];
+  categories: Category[];
+  onEdit: (expense: Expense) => void;
+  onShowNote: (note: { title: string; note: string }) => void;
+  empty: string;
+}) {
   if (!expenses.length) return empty ? <EmptyState>{empty}</EmptyState> : null;
   return (
     <div className="space-y-3">
       {expenses.map((expense) => {
         const category = categories.find((item) => item.id === expense.categoryId);
+        const title = category?.name || "Unknown";
         return (
-          <motion.button
+          <motion.article
             key={expense.id}
             layout
             whileTap={{ scale: 0.985 }}
-            className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-left"
-            onClick={() => onEdit(expense)}
+            className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-2.5 text-left"
           >
-            {category ? <CategoryIcon category={category} /> : <div className="h-11 w-11 rounded-2xl bg-slate-700" />}
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold">{category?.name || "Unknown"}</p>
-              <p className="text-sm text-slate-500">
-                {formatDisplayDate(expense.date)} · {expense.paymentSource} card
-              </p>
-            </div>
-            <p className="font-semibold">{rupee.format(expense.amount)}</p>
-          </motion.button>
+            <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => onEdit(expense)}>
+              {category ? <CategoryIcon category={category} /> : <div className="h-11 w-11 rounded-2xl bg-slate-700" />}
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-semibold">{title}</span>
+                <span className="block text-sm text-slate-500">
+                  {formatDisplayDate(expense.date)} · {expense.paymentSource} card
+                </span>
+              </span>
+            </button>
+            {expense.note && (
+              <button
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-slate-400"
+                aria-label="View note"
+                onClick={() => onShowNote({ title, note: expense.note || "" })}
+              >
+                <MessageSquareText className="h-4 w-4" />
+              </button>
+            )}
+            <p className="shrink-0 font-semibold">{rupee.format(expense.amount)}</p>
+          </motion.article>
         );
       })}
     </div>
@@ -1039,11 +1126,23 @@ function Toast({ message }: { message: string }) {
       exit={{ opacity: 0, y: 16 }}
     >
       <div className="flex items-center gap-2 rounded-full border border-white/10 bg-slate-100 px-4 py-3 text-sm font-semibold text-ink-950 shadow-lift">
-        <Check className="h-4 w-4 text-accent" />
+        <motion.span
+          className="grid h-5 w-5 place-items-center rounded-full bg-accent text-ink-950 shadow-[0_0_18px_rgba(20,184,166,0.55)]"
+          initial={{ scale: 0.4, rotate: -18 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 520, damping: 18 }}
+        >
+          <Check className="h-3.5 w-3.5" />
+        </motion.span>
         {message}
       </div>
     </motion.div>
   );
+}
+
+function cleanNote(note: string) {
+  const trimmed = note.trim();
+  return trimmed ? trimmed : undefined;
 }
 
 function isValidExpenseDraft(draft: ExpenseDraft) {

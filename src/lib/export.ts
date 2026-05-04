@@ -34,7 +34,8 @@ export function parseBackup(value: unknown): BackupPayload {
       typeof expense.amount !== "number" ||
       !["Me", "Dad"].includes(expense.paymentSource) ||
       typeof expense.categoryId !== "string" ||
-      typeof expense.date !== "string"
+      typeof expense.date !== "string" ||
+      (expense.note !== undefined && typeof expense.note !== "string")
     ) {
       throw new Error("Backup contains an invalid expense.");
     }
@@ -73,7 +74,7 @@ export function downloadFile(filename: string, body: string, type: string) {
 
 export function toCsv(expenses: Expense[], categories: Category[]) {
   const categoryName = new Map(categories.map((category) => [category.id, category.name]));
-  const rows = [["Date", "Amount", "Paid With", "Category"]];
+  const rows = [["Date", "Amount", "Paid With", "Category", "Note"]];
 
   expenses
     .slice()
@@ -84,6 +85,7 @@ export function toCsv(expenses: Expense[], categories: Category[]) {
         String(expense.amount),
         expense.paymentSource,
         categoryName.get(expense.categoryId) || "Unknown",
+        expense.note || "",
       ]);
     });
 
