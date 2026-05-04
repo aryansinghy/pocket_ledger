@@ -499,9 +499,9 @@ function AddTab({
             onChange={(event) => setDraft((current) => ({ ...current, date: event.target.value }))}
           />
         </label>
-        <button className="h-14 rounded-2xl border border-white/10 px-4 text-sm font-semibold text-slate-300" onClick={() => setDraft((current) => ({ ...current, date: todayISO() }))}>
+        <motion.button className="h-14 rounded-2xl border border-white/10 px-4 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.04]" whileTap={{ scale: 0.96 }} onClick={() => setDraft((current) => ({ ...current, date: todayISO() }))}>
           Today
-        </button>
+        </motion.button>
       </section>
 
       <label className="block">
@@ -516,7 +516,7 @@ function AddTab({
 
       <motion.button
         whileTap={isValid ? { scale: 0.98 } : undefined}
-        className="h-[60px] w-full rounded-[22px] bg-accent px-5 py-4 text-base font-bold text-ink-950 shadow-lift transition disabled:bg-slate-800 disabled:text-slate-500 disabled:shadow-none"
+        className="h-[60px] w-full rounded-[22px] bg-accent px-5 py-4 text-base font-bold text-ink-950 shadow-lift transition hover:shadow-[0_18px_44px_rgba(20,184,166,0.18)] active:shadow-[0_10px_28px_rgba(20,184,166,0.14)] disabled:bg-slate-800 disabled:text-slate-500 disabled:shadow-none"
         disabled={!isValid}
         onClick={onSave}
       >
@@ -942,11 +942,13 @@ function BottomNav({ activeTab, onChange }: { activeTab: TabId; onChange: (tab: 
           const Icon = tab.icon;
           const selected = activeTab === tab.id;
           return (
-            <button key={tab.id} className={`relative flex h-16 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-semibold transition ${selected ? "text-accent" : "text-slate-500"}`} onClick={() => onChange(tab.id)}>
-              {selected && <motion.span layoutId="active-tab" className="absolute inset-1 rounded-2xl bg-accent/10" />}
-              <Icon className="relative h-5 w-5" />
+            <motion.button key={tab.id} className={`relative flex h-16 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-semibold transition ${selected ? "text-accent" : "text-slate-500"}`} whileTap={{ scale: 0.94 }} onClick={() => onChange(tab.id)}>
+              {selected && <motion.span layoutId="active-tab" className="absolute inset-1 rounded-2xl bg-accent/10 shadow-[inset_0_0_0_1px_rgba(20,184,166,0.08)]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+              <motion.span className="relative" animate={{ y: selected ? -1 : 0, scale: selected ? 1.04 : 1 }} transition={{ duration: 0.16 }}>
+                <Icon className="h-5 w-5" />
+              </motion.span>
               <span className="relative">{tab.label}</span>
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -977,8 +979,8 @@ function ExpenseList({
           <motion.article
             key={expense.id}
             layout
-            whileTap={{ scale: 0.985 }}
-            className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-2.5 text-left"
+            whileTap={{ scale: 0.982 }}
+            className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-2.5 text-left transition-colors hover:bg-white/[0.045]"
           >
             <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => onEdit(expense)}>
               {category ? <CategoryIcon category={category} /> : <div className="h-11 w-11 rounded-2xl bg-slate-700" />}
@@ -991,7 +993,7 @@ function ExpenseList({
             </button>
             {expense.note && (
               <button
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-slate-400"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-slate-400 transition hover:border-accent/30 hover:bg-accent/10 hover:text-accent active:scale-95"
                 aria-label="View note"
                 onClick={() => onShowNote({ title, note: expense.note || "" })}
               >
@@ -1009,8 +1011,8 @@ function ExpenseList({
 function CategoryButton({ category, selected, onClick }: { category: Category; selected: boolean; onClick: () => void }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.98 }}
-      className={`flex min-h-16 items-center gap-3 rounded-2xl border p-3 text-left transition ${selected ? "border-accent bg-accent/10" : "border-white/10 bg-white/[0.04]"}`}
+      whileTap={{ scale: 0.965 }}
+      className={`flex min-h-16 items-center gap-3 rounded-2xl border p-3 text-left transition ${selected ? "border-accent/80 bg-accent/12 shadow-[inset_0_0_0_1px_rgba(20,184,166,0.12),0_12px_30px_rgba(20,184,166,0.08)]" : "border-white/10 bg-white/[0.04] hover:bg-white/[0.06]"}`}
       onClick={onClick}
     >
       <CategoryIcon category={category} />
@@ -1031,8 +1033,8 @@ function CategoryIcon({ category }: { category: Category }) {
 function ChoiceButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.98 }}
-      className={`flex h-14 items-center justify-center gap-2 rounded-2xl border text-base font-semibold transition ${selected ? "border-accent bg-accent/10 text-accent" : "border-white/10 bg-white/[0.04] text-slate-300"}`}
+      whileTap={{ scale: 0.965 }}
+      className={`flex h-14 items-center justify-center gap-2 rounded-2xl border text-base font-semibold transition ${selected ? "border-accent/80 bg-accent/12 text-accent shadow-[inset_0_0_0_1px_rgba(20,184,166,0.12),0_10px_26px_rgba(20,184,166,0.07)]" : "border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.06]"}`}
       onClick={onClick}
     >
       {children}
@@ -1049,13 +1051,13 @@ function MonthSwitcher({ month, onChange }: { month: string; onChange: (month: s
 
   return (
     <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] p-2">
-      <button className="icon-action" onClick={() => shift(-1)} aria-label="Previous month">
+      <motion.button className="icon-action" whileTap={{ scale: 0.9 }} onClick={() => shift(-1)} aria-label="Previous month">
         <ChevronLeft className="h-5 w-5" />
-      </button>
+      </motion.button>
       <p className="font-semibold text-slate-200">{monthBounds(month).label}</p>
-      <button className="icon-action" onClick={() => shift(1)} aria-label="Next month">
+      <motion.button className="icon-action" whileTap={{ scale: 0.9 }} onClick={() => shift(1)} aria-label="Next month">
         <ChevronRight className="h-5 w-5" />
-      </button>
+      </motion.button>
     </div>
   );
 }
@@ -1107,7 +1109,7 @@ function BreakdownRow({ category, amount, percentage }: ReturnType<typeof catego
 
 function SettingsButton({ icon: Icon, label, detail, danger, onClick }: { icon: LucideIcon; label: string; detail: string; danger?: boolean; onClick: () => void }) {
   return (
-    <button className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-left" onClick={onClick}>
+    <motion.button className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-left transition-colors hover:bg-white/[0.05]" whileTap={{ scale: 0.982 }} onClick={onClick}>
       <span className={`grid h-11 w-11 place-items-center rounded-2xl ${danger ? "bg-rose-500/10 text-rose-400" : "bg-accent/10 text-accent"}`}>
         <Icon className="h-5 w-5" />
       </span>
@@ -1115,7 +1117,7 @@ function SettingsButton({ icon: Icon, label, detail, danger, onClick }: { icon: 
         <span className="block font-semibold">{label}</span>
         <span className="block text-sm text-slate-500">{detail}</span>
       </span>
-    </button>
+    </motion.button>
   );
 }
 
