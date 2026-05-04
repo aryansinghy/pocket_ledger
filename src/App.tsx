@@ -1156,9 +1156,12 @@ function RupeeFlare() {
 
   const glyphs = [
     { x: "-38vw", y: -74, rotate: -18, delay: 0.02 },
+    { x: "-31vw", y: -112, rotate: 8, delay: 0.18 },
     { x: "-22vw", y: -126, rotate: 12, delay: 0.1 },
+    { x: "-10vw", y: -154, rotate: -14, delay: 0.2 },
     { x: "0vw", y: -96, rotate: -8, delay: 0 },
     { x: "23vw", y: -138, rotate: 16, delay: 0.08 },
+    { x: "12vw", y: -166, rotate: 10, delay: 0.14 },
     { x: "38vw", y: -78, rotate: -12, delay: 0.16 },
   ];
 
@@ -1173,9 +1176,9 @@ function RupeeFlare() {
       {glyphs.map((glyph, index) => (
         <motion.span
           key={index}
-          className="absolute select-none text-xl font-semibold text-accent/70 drop-shadow-[0_0_14px_rgba(20,184,166,0.28)]"
+          className="absolute select-none text-xl font-semibold text-accent/85 drop-shadow-[0_0_16px_rgba(20,184,166,0.36)]"
           initial={{ opacity: 0, x: 0, y: 0, scale: 0.72, rotate: 0 }}
-          animate={{ opacity: [0, 0.72, 0], x: glyph.x, y: glyph.y, scale: [0.72, 1, 0.86], rotate: glyph.rotate }}
+          animate={{ opacity: [0, 0.84, 0], x: glyph.x, y: glyph.y, scale: [0.72, 1, 0.86], rotate: glyph.rotate }}
           exit={{ opacity: 0 }}
           transition={{ duration: 2.2, delay: glyph.delay, ease: "easeOut" }}
         >
