@@ -822,16 +822,19 @@ function EditExpenseSheet({
 function NoteSheet({ title, note, onClose }: { title: string; note: string; onClose: () => void }) {
   return (
     <BottomSheet title="Note" onClose={onClose}>
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/10 text-accent">
-            <MessageSquareText className="h-5 w-5" />
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 rounded-[22px] border border-white/10 bg-white/[0.035] p-3.5">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-accent/10 text-accent ring-1 ring-accent/15">
+            <MessageSquareText className="h-[18px] w-[18px]" />
           </span>
-          <p className="min-w-0 flex-1 truncate font-semibold">{title}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Expense</p>
+            <p className="mt-1 truncate text-base font-semibold text-slate-100">{title}</p>
+          </div>
         </div>
-        <p className="whitespace-pre-wrap rounded-2xl border border-white/10 bg-white/[0.04] p-4 leading-relaxed text-slate-200">
-          {note}
-        </p>
+        <div className="rounded-[24px] border border-white/10 bg-ink-850 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <p className="whitespace-pre-wrap text-[1.05rem] leading-7 text-slate-100">{note}</p>
+        </div>
       </div>
     </BottomSheet>
   );
