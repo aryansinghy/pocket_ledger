@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type React from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   BarChart3,
   BookOpen,
@@ -114,6 +114,7 @@ export default function App() {
   const [viewingNote, setViewingNote] = useState<{ title: string; note: string } | null>(null);
   const [categoryDraft, setCategoryDraft] = useState<CategoryDraft | null>(null);
   const [toast, setToast] = useState("");
+  const [rupeeFlareId, setRupeeFlareId] = useState(0);
   const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -136,6 +137,11 @@ export default function App() {
     window.setTimeout(() => setToast(""), 2200);
   };
 
+  const showExpenseAdded = () => {
+    showToast("Expense added");
+    setRupeeFlareId((id) => id + 1);
+  };
+
   const handleAddExpense = async () => {
     const amount = Number(expenseDraft.amount);
     if (!isValidExpenseDraft(expenseDraft)) return;
@@ -153,7 +159,7 @@ export default function App() {
     });
 
     setExpenseDraft(emptyExpenseDraft());
-    showToast("Expense added");
+    showExpenseAdded();
   };
 
   const handleSaveExpense = async (draft: ExpenseDraft) => {
@@ -356,6 +362,7 @@ export default function App() {
       />
 
       <AnimatePresence>{toast && <Toast message={toast} />}</AnimatePresence>
+      <AnimatePresence>{rupeeFlareId > 0 && <RupeeFlare key={rupeeFlareId} />}</AnimatePresence>
 
       <AnimatePresence>
         {editingExpense && (
@@ -1139,6 +1146,42 @@ function Toast({ message }: { message: string }) {
         </motion.span>
         {message}
       </div>
+    </motion.div>
+  );
+}
+
+function RupeeFlare() {
+  const reduceMotion = useReducedMotion();
+  if (reduceMotion) return null;
+
+  const glyphs = [
+    { x: "-38vw", y: -74, rotate: -18, delay: 0.02 },
+    { x: "-22vw", y: -126, rotate: 12, delay: 0.1 },
+    { x: "0vw", y: -96, rotate: -8, delay: 0 },
+    { x: "23vw", y: -138, rotate: 16, delay: 0.08 },
+    { x: "38vw", y: -78, rotate: -12, delay: 0.16 },
+  ];
+
+  return (
+    <motion.div
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(122px+env(safe-area-inset-bottom))] z-40 mx-auto flex h-36 max-w-[480px] items-end justify-center overflow-visible"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.28, delay: 1.92 }}
+    >
+      {glyphs.map((glyph, index) => (
+        <motion.span
+          key={index}
+          className="absolute select-none text-xl font-semibold text-accent/70 drop-shadow-[0_0_14px_rgba(20,184,166,0.28)]"
+          initial={{ opacity: 0, x: 0, y: 0, scale: 0.72, rotate: 0 }}
+          animate={{ opacity: [0, 0.72, 0], x: glyph.x, y: glyph.y, scale: [0.72, 1, 0.86], rotate: glyph.rotate }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 2.2, delay: glyph.delay, ease: "easeOut" }}
+        >
+          ₹
+        </motion.span>
+      ))}
     </motion.div>
   );
 }
